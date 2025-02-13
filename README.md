@@ -1,4 +1,4 @@
-# Basic Tunneling Over Websocket
+# Basic Tunneling Over Websocket + SocksV5
 
 ## Usage
 
