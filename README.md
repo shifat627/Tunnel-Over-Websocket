@@ -2,7 +2,7 @@
 
 ## Usage
 
-First , You Must Run the frontEnd_Waiter_Server.py
+First , You Must Run the **frontEnd_Waiter_Server.py**
 This is the http Server. You can host any where you want. Just Change the websocket url in the file accordingly to url of the hosted site
 
 > run the Agent.py on the target PC. It will connect back to the web server
