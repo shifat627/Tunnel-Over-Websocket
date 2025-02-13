@@ -17,10 +17,10 @@ from packet_utils import PayloadManager,PacketManager
 async def ws_connect():
         
     
-        PkgMgr = PacketManager()
+    PkgMgr = PacketManager()
     
     
-    #try:
+    try:
         async with websockets.connect('ws://localhost/PTnlWsAgent') as ws:
             PayloadMgr = PayloadManager(ws)
             print("Connected")
@@ -46,7 +46,7 @@ async def ws_connect():
 
 
 
-    # except Exception as Err:
-    #     print(str(Err))
+    except Exception as Err:
+        print(str(Err))
 
 asyncio.run(ws_connect())
