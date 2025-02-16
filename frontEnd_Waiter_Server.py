@@ -2,7 +2,9 @@ from aiohttp import web
 from uuid import uuid4
 
 
+import logging
 
+logging.basicConfig(level=logging.DEBUG) # To print log on terminal
 
 class HandleWsClient:
 

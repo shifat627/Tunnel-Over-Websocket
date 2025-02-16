@@ -194,7 +194,7 @@ class SockV5Handler:
                 ConnPayload += socket.inet_aton(self.remote_host['ip']) + int.to_bytes(self.remote_host['port'],2,'big')
             elif self.remote_host['type'] == 3:
                 ConnType = 4
-                ConnPayload +=  int.to_bytes(self.remote_host['port'],2,'big') + int.to_bytes(len(self.remote_host['dns_name']),1,'little') + self.remote_host['dns_name'].encode()
+                ConnPayload +=  int.to_bytes(self.remote_host['port'],2,'big') + int.to_bytes(len(self.remote_host['ip']),1,'little') + self.remote_host['ip'].encode()
             
             ConnHeader = self.generate_packet(self.session_id,ConnPayload,ConnType)
             

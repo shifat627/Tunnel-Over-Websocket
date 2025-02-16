@@ -32,19 +32,20 @@ async def ws_connect():
             print("Connected")
             
             while True:
-                # data = await ws.recv()
+                data = await ws.recv()
                 
-                # if isinstance(data,bytes):
-                #     PkgMgr.feed(data)
+                if isinstance(data,bytes):
+                    PkgMgr.feed(data)
+                    #print(data)
 
                 
-                try:
-                    data = await asyncio.wait_for(ws.recv(),3)
-                    if isinstance(data,bytes):
-                        PkgMgr.feed(data)
-                        #print(data)
-                except:
-                    pass
+                # try:
+                #     data = await asyncio.wait_for(ws.recv(),3)
+                #     if isinstance(data,bytes):
+                #         PkgMgr.feed(data)
+                #         #print(data)
+                # except:
+                #     pass
                 
                 result = PkgMgr.Parse()
                 
@@ -55,7 +56,8 @@ async def ws_connect():
 
 
     except Exception as Err:
-        print(str(Err))
+        
+        print("SockV5_Proxy_Server\\Ws_SocksV5_Server.py -> "+str(Err))
 
     finally:
         if SocksHandler is not None:
@@ -71,9 +73,10 @@ async def HandleSocksClient(reader,writer):
 
     except Exception as Err:
         print(str(Err))
-    finally:
-        writer.close()
-        await writer.wait_closed()
+    
+    # finally: # was Causing Disconnection error Error 
+    #     writer.close()
+    #     await writer.wait_closed()
 
 
 async def StartSocks5():
