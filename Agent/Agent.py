@@ -21,7 +21,7 @@ async def ws_connect():
     
     
     try:
-        async with websockets.connect('ws://localhost/PTnlWsAgent') as ws:
+        async with websockets.connect('ws://localhost/Agent') as ws:
             PayloadMgr = PayloadManager(ws)
             print("Connected")
             while True:

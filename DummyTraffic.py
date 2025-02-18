@@ -39,7 +39,7 @@ for i in range(5):
     packets.append(packet)
 
 
-packets.append(dummy.generate_packet(random.randint(0, 0xFFFF), b'',random.randint(0, 5)))
+packets.append(dummy.generate_packet(0, b'',10))
 
 # Print packet data in hex format
 for idx, packet in enumerate(packets):
