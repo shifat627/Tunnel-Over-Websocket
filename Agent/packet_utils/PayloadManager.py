@@ -1,4 +1,4 @@
-import asyncio,websockets,zlib,struct,socket
+import asyncio,websockets,zlib,struct,socket,traceback
 
 class PayloadManager:
 
@@ -54,12 +54,20 @@ class PayloadManager:
 
         elif data['type'] == 2:
             if data['chID'] in self.client_list:
-                self.client_list[data['chID']][1].write(data['data'])
-                await self.client_list[data['chID']][1].drain()
+                try:
+                    self.client_list[data['chID']][1].write(data['data'])
+                    await self.client_list[data['chID']][1].drain()
+                except:
+                    pass
 
         elif data['type'] == 3:
             if data['chID'] in self.TaskList:
                 self.TaskList[data['chID']].cancel()
+        
+        elif data['type'] == 10:
+            print('Closing all connection')
+            for key in self.TaskList:
+                self.TaskList[key].cancel()
 
     
     async def ConnectToTarget(self,target, port,chID):
@@ -73,16 +81,16 @@ class PayloadManager:
 
             header = self.generate_packet(chID,socket.inet_aton(target) + int.to_bytes(port,2,'big'),1)
         
-            await self.semaphore.acquire()
-            await self.ws_client.send(header)
-            self.semaphore.release()
+            async with self.semaphore:
+                await self.ws_client.send(header)
+            
 
             
 
             return stream
         
         except Exception as Err:
-            print(str(Err))
+            traceback.print_exc()
             
         
         return None
@@ -92,23 +100,28 @@ class PayloadManager:
         #header = int.to_bytes(0xdeadbeef,4,'little') + int.to_bytes(chID,2,'little') + int.to_bytes(0,4,'little') + int.to_bytes(0x1,2,'little') + int.to_bytes(0,4,'little')
         header = self.generate_packet(chID,b'',0)
         
-        await self.semaphore.acquire()
-        await self.ws_client.send(header)
-        self.semaphore.release()
+        async with self.semaphore:
+            await self.ws_client.send(header)
+        
 
         
     async def HandleClient(self,chID):
-
+        
         try:
+            sr : asyncio.StreamReader = self.client_list[chID][0]
+            
             while True:
-                data = await self.client_list[chID][0].read(1024)
+                #data = await self.client_list[chID][0].read(1024)
+                data = await sr.read(1024)
                 if len(data) != 0:
-                    await self.semaphore.acquire()
-                    await self.ws_client.send(self.generate_packet(chID,data,2))
-                    self.semaphore.release()
+                    async with self.semaphore:
+                        await self.ws_client.send(self.generate_packet(chID,data,2))
+                    
                 else:
                     raise Exception('Disconnected')
         except:
+            traceback.print_exc()
+        finally:
              
             if chID in self.client_list:
                 self.client_list[chID][1].close()

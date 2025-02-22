@@ -21,22 +21,22 @@ async def ws_connect():
     
     
     try:
-        async with websockets.connect('ws://localhost/PTnlWsAgent') as ws:
+        async with websockets.connect('ws://localhost/Agent') as ws:
             PayloadMgr = PayloadManager(ws)
             print("Connected")
             while True:
-                # data = await ws.recv()
+                data = await ws.recv()
                 
-                # if isinstance(data,bytes):
-                #     PkgMgr.feed(data)
+                if isinstance(data,bytes):
+                    PkgMgr.feed(data)
 
                 
-                try:
-                    data = await asyncio.wait_for(ws.recv(),3)
-                    if isinstance(data,bytes):
-                        PkgMgr.feed(data)
-                except:
-                    pass
+                # try:
+                #     data = await asyncio.wait_for(ws.recv(),3)
+                #     if isinstance(data,bytes):
+                #         PkgMgr.feed(data)
+                # except:
+                #     pass
                 
                 result = PkgMgr.Parse()
                 
